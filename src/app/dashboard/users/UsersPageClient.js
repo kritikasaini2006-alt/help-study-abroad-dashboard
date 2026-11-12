@@ -86,52 +86,55 @@ export default function UsersPage() {
           </Box>
         ) : (
           <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>User</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Username</TableCell>
-                    <TableCell>Company</TableCell>
-                  </TableRow>
-                </TableHead>
+         <TableContainer>
+  <Table>
+    <TableHead>
+      <TableRow>
+        <TableCell>User</TableCell>
+        <TableCell>Email</TableCell>
+        <TableCell>Username</TableCell>
+        <TableCell>Gender</TableCell>
+        <TableCell>Phone</TableCell>
+        <TableCell>Company</TableCell>
+      </TableRow>
+    </TableHead>
 
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id} hover>
-                      <TableCell>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1.5,
-                          }}
-                        >
-                          <Avatar src={user.image} alt={user.firstName} />
-                          <Typography fontWeight={600}>
-                            {user.firstName} {user.lastName}
-                          </Typography>
-                        </Box>
-                      </TableCell>
+    <TableBody>
+      {users.map((user) => (
+        <TableRow key={user.id} hover>
+          <TableCell>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <Avatar src={user.image} alt={user.firstName} />
+              <Typography fontWeight={600}>
+                {user.firstName} {user.lastName}
+              </Typography>
+            </Box>
+          </TableCell>
 
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.username}</TableCell>
-                      <TableCell>{user.company?.name || "—"}</TableCell>
-                    </TableRow>
-                  ))}
+          <TableCell>{user.email}</TableCell>
+          <TableCell>{user.username}</TableCell>
+          <TableCell>{user.gender || "—"}</TableCell>
+          <TableCell>{user.phone || "—"}</TableCell>
+          <TableCell>{user.company?.name || "—"}</TableCell>
+        </TableRow>
+      ))}
 
-                  {users.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center">
-                        No users found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
+      {users.length === 0 && (
+        <TableRow>
+          <TableCell colSpan={6} align="center">
+            No users found.
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
             <TablePagination
               component="div"
               count={total}
