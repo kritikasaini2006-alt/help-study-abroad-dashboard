@@ -27,7 +27,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-
+import { useAuthStore } from "../store/authStore";
 const drawerWidth = 240;
 
 const menuItems = [
@@ -51,7 +51,7 @@ const menuItems = [
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-
+ const logout = useAuthStore((state) => state.logout);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -61,7 +61,10 @@ export default function DashboardLayout({ children }) {
     router.push(path);
     setMobileOpen(false);
   }
-
+async function handleLogout() {
+  logout();
+  await signOut({ callbackUrl: "/" });
+}
   const drawerContent = (
     <>
       <Toolbar />
@@ -139,7 +142,7 @@ export default function DashboardLayout({ children }) {
             color="error"
             size={isMobile ? "small" : "medium"}
             startIcon={<LogoutRoundedIcon />}
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={handleLogout}
             sx={{
               textTransform: "none",
               fontWeight: 600,

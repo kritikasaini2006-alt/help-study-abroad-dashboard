@@ -17,7 +17,8 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
+import { useAuthStore } from "./store/authStore";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -26,7 +27,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-
+const setAuth = useAuthStore((state) => state.setAuth);
   async function handleLogin(event) {
     event.preventDefault();
     setLoading(true);
@@ -40,11 +41,30 @@ export default function LoginPage() {
       });
 
       if (result?.ok) {
-        router.push("/dashboard");
-        router.refresh();
-      } else {
-        setError("Invalid username or password.");
-      }
+  const session = await getSession();
+
+  if (!session?.user) {
+    setError("Login succeeded, but the session could not be loaded.");
+    return;
+  }
+
+  setAuth(
+    {
+      id: session.user.id,
+      firstName: session.user.name?.split(" ")[0] || "Admin",
+      lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
+      username: session.user.username,
+      email: session.user.email,
+      image: session.user.image,
+    },
+    session.accessToken
+  );
+
+  router.push("/dashboard");
+  router.refresh();
+} else {
+  setError("Invalid username or password.");
+}
     } catch {
       setError("Unable to sign in. Please try again.");
     } finally {

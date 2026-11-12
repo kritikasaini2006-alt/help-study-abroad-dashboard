@@ -14,6 +14,14 @@ export const useAuthStore = create(
       setHasHydrated: (value) => {
         set({ hasHydrated: value });
       },
+      setAuth: (user, token) => {
+  set({
+    user,
+    token,
+    loading: false,
+    error: null,
+  });
+},
 
       login: async (username, password) => {
         set({ loading: true, error: null });

@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useApiStore } from "../../store/apiStore";
 
 import {
@@ -20,9 +20,66 @@ import {
   Chip,
   Alert,
 } from "@mui/material";
+const ProductCard = memo(function ProductCard({ product, onOpen }) {
+  return (
+    <Card
+      onClick={() => onOpen(product.id)}
+      sx={{
+        cursor: "pointer",
+        height: "100%",
+        borderRadius: 3,
+        transition: "0.2s",
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: 5,
+        },
+      }}
+    >
+      <CardMedia
+        component="img"
+        image={product.thumbnail}
+        alt={product.title}
+        sx={{ height: 190, objectFit: "contain", p: 2 }}
+      />
 
+      <CardContent>
+        <Typography
+          variant="h6"
+          fontWeight={600}
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {product.title}
+        </Typography>
+
+        <Chip
+          size="small"
+          label={product.category.replace(/-/g, " ")}
+          sx={{ my: 1 }}
+        />
+
+        <Typography variant="h6" color="primary" fontWeight={700}>
+          ${product.price}
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          Rating: {product.rating} / 5
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+});
 export default function ProductsPage() {
   const router = useRouter();
+  const handleOpenProduct = useCallback(
+  (id) => {
+    router.push(`/dashboard/products/${id}`);
+  },
+  [router]
+);
   const limit = 12;
 
   const [search, setSearch] = useState("");
@@ -84,14 +141,17 @@ const categoriesError = useApiStore(
   };
 
   // Apply the category filter when searching
-  const visibleProducts =
-    search.trim() && category
-      ? products.filter((product) => product.category === category)
-      : products;
+  const visibleProducts = useMemo(() => {
+  if (search.trim() && category) {
+    return products.filter((product) => product.category === category);
+  }
 
-  const visibleTotal =
-    search.trim() && category ? visibleProducts.length : total;
+  return products;
+}, [products, search, category]);
 
+const visibleTotal = useMemo(() => {
+  return search.trim() && category ? visibleProducts.length : total;
+}, [search, category, visibleProducts, total]);
   return (
     <Box
       sx={{
@@ -155,62 +215,16 @@ const categoriesError = useApiStore(
         <>
           <Grid container spacing={3}>
             {visibleProducts.map((product) => (
-              <Grid
-                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-                key={product.id}
-              >
-                <Card
-                  onClick={() =>
-                    router.push(`/dashboard/products/${product.id}`)
-                  }
-                  sx={{
-                    cursor: "pointer",
-                    height: "100%",
-                    borderRadius: 3,
-                    transition: "0.2s",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: 5,
-                    },
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    image={product.thumbnail}
-                    alt={product.title}
-                    sx={{ height: 190, objectFit: "contain", p: 2 }}
-                  />
-
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      fontWeight={600}
-                      sx={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {product.title}
-                    </Typography>
-
-                    <Chip
-                      size="small"
-                      label={product.category.replace(/-/g, " ")}
-                      sx={{ my: 1 }}
-                    />
-
-                    <Typography variant="h6" color="primary" fontWeight={700}>
-                      ${product.price}
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary">
-                      Rating: {product.rating} / 5
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+  <Grid
+    size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+    key={product.id}
+  >
+    <ProductCard
+      product={product}
+      onOpen={handleOpenProduct}
+    />
+  </Grid>
+))}
           </Grid>
 
           {visibleProducts.length === 0 && (

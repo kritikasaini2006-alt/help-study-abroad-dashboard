@@ -7,14 +7,8 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "DummyJSON",
       credentials: {
-        username: {
-          label: "Username",
-          type: "text",
-        },
-        password: {
-          label: "Password",
-          type: "password",
-        },
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
       },
 
       async authorize(credentials) {
@@ -26,9 +20,7 @@ const handler = NextAuth({
           "https://dummyjson.com/auth/login",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               username: credentials.username,
               password: credentials.password,
@@ -48,6 +40,8 @@ const handler = NextAuth({
           name: `${data.firstName} ${data.lastName}`,
           email: data.email,
           image: data.image,
+          username: data.username,
+          accessToken: data.accessToken || data.token,
         };
       },
     }),
@@ -55,6 +49,26 @@ const handler = NextAuth({
 
   session: {
     strategy: "jwt",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.accessToken = user.accessToken;
+        token.username = user.username;
+        token.id = user.id;
+      }
+
+      return token;
+    },
+
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+      session.user.id = token.id;
+      session.user.username = token.username;
+
+      return session;
+    },
   },
 
   pages: {
