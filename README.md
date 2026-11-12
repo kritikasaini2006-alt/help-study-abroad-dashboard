@@ -128,4 +128,41 @@ This approach reduces unnecessary network requests while keeping the implementat
 src/app/
 ├── api/
 │   └── auth/
-│       └── [...nextauth
+│       └── [...nextauth]/
+│           └── route.js
+├── components/
+│   ├── AuthGuard.js
+│   └── DashboardLayout.js
+├── dashboard/
+│   ├── page.js
+│   ├── users/
+│   │   ├── page.js
+│   │   ├── UsersPageClient.js
+│   │   └── [id]/
+│   │       ├── page.js
+│   │       └── UserDetailsClient.js
+│   └── products/
+│       ├── page.js
+│       ├── ProductsPageClient.js
+│       └── [id]/
+│           ├── page.js
+│           └── ProductDetailsClient.js
+├── store/
+│   ├── authStore.js
+│   └── apiStore.js
+├── utils/
+│   └── apiCache.js
+├── layout.js
+├── page.js
+└── theme.js
+```
+
+## Security Notes
+
+- Never commit `.env.local` or expose authentication secrets.
+- DummyJSON provides demonstration data and is not a production user database.
+- Production deployments should use appropriate secure authentication, authorization, and environment configuration.
+
+## License
+
+No license has been specified for this project.
